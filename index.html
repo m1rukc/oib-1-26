@@ -2,94 +2,156 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05060a">
 <title>ОИБ 1-26 — Журнал посещаемости</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 *::selection{background:#0066ff;color:#fff}
-:root{--bg:#05060a;--bg-2:#0a0c11;--surface:#0f1116;--surface-2:#141821;--surface-3:#1b202c;--line:rgba(255,255,255,.06);--line-2:rgba(255,255,255,.1);--line-3:rgba(255,255,255,.18);--text:#f7f8fb;--text-2:#9aa1b0;--text-3:#646b7a;--text-4:#3f4552;--blue:#0055ff;--blue-hi:#3b82f6;--blue-lt:#93c5fd;--green:#00d67a;--violet:#8b5cf6;--pink:#ec4899;--amber:#ffb800;--red:#ff3b47;--sans:'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:'JetBrains Mono','SF Mono',ui-monospace,monospace}
-[data-theme="light"]{--bg:#fafafa;--bg-2:#f3f4f6;--surface:#fff;--surface-2:#f9fafb;--surface-3:#f3f4f6;--line:rgba(0,0,0,.07);--line-2:rgba(0,0,0,.11);--line-3:rgba(0,0,0,.18);--text:#0a0a0a;--text-2:#525866;--text-3:#7c8391;--text-4:#b0b5be;--blue:#0055ff;--blue-hi:#2563eb;--blue-lt:#1e40af;--green:#059669;--violet:#7c3aed;--pink:#db2777;--amber:#d97706;--red:#dc2626}
-html{scroll-behavior:smooth}
+:root{
+--bg:#05060a;--bg-2:#0a0c11;--surface:#0f1116;--surface-2:#141821;--surface-3:#1b202c;
+--line:rgba(255,255,255,.06);--line-2:rgba(255,255,255,.1);--line-3:rgba(255,255,255,.18);
+--text:#f7f8fb;--text-2:#9aa1b0;--text-3:#646b7a;--text-4:#3f4552;
+--blue:#0055ff;--blue-hi:#3b82f6;--blue-lt:#93c5fd;
+--green:#00d67a;--violet:#8b5cf6;--pink:#ec4899;--amber:#ffb800;--red:#ff3b47;
+--sans:'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+--name-w:230px;--date-w:52px;--num-w:44px;--row-h:44px
+}
+[data-theme="light"]{
+--bg:#fafafa;--bg-2:#f3f4f6;--surface:#fff;--surface-2:#f9fafb;--surface-3:#f3f4f6;
+--line:rgba(0,0,0,.07);--line-2:rgba(0,0,0,.11);--line-3:rgba(0,0,0,.18);
+--text:#0a0a0a;--text-2:#525866;--text-3:#7c8391;--text-4:#b0b5be;
+--blue:#0055ff;--blue-hi:#2563eb;--blue-lt:#1e40af;
+--green:#059669;--violet:#7c3aed;--pink:#db2777;--amber:#d97706;--red:#dc2626
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased;letter-spacing:-.011em;transition:background .4s ease,color .4s ease}
 @media(max-width:960px){body{cursor:auto}}
 button,input,textarea{font-family:inherit}
 
-/* BOOT */
-#boot{position:fixed;inset:0;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity .8s ease,visibility .8s ease}
+/* ═══════ BOOT — улучшенная анимация ═══════ */
+#boot{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 45%,#0a0d18 0%,#000 70%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity 1.2s cubic-bezier(.4,0,.2,1),visibility 1.2s ease}
 #boot.done{opacity:0;visibility:hidden;pointer-events:none}
-.boot-stage{position:relative;width:min(460px,92vw);height:min(460px,92vw);display:flex;align-items:center;justify-content:center}
-.boot-flash{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,rgba(147,197,253,.95) 20%,rgba(139,92,246,.6) 40%,transparent 65%);filter:blur(20px);transform:translate(-50%,-50%) scale(0);opacity:0;animation:flash-burst 1.2s cubic-bezier(.16,1,.3,1) 3.2s forwards;pointer-events:none;z-index:8}
-@keyframes flash-burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}20%{transform:translate(-50%,-50%) scale(3);opacity:1}50%{transform:translate(-50%,-50%) scale(10);opacity:.7}100%{transform:translate(-50%,-50%) scale(30);opacity:0}}
-.boot-rays{position:absolute;top:50%;left:50%;width:0;height:0;z-index:7;opacity:0;animation:rays-show 1s ease 3.25s forwards;pointer-events:none}
-.boot-rays::before,.boot-rays::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:0;background:linear-gradient(180deg,transparent,#fff,transparent);box-shadow:0 0 24px rgba(147,197,253,1);transform:translate(-50%,-50%) rotate(0deg)}
-.boot-rays::before{animation:ray-grow 1.1s cubic-bezier(.16,1,.3,1) 3.25s forwards}
-.boot-rays::after{transform:translate(-50%,-50%) rotate(90deg);animation:ray-grow 1.1s cubic-bezier(.16,1,.3,1) 3.3s forwards}
+.boot-stage{position:relative;width:min(520px,94vw);height:min(520px,94vw);display:flex;align-items:center;justify-content:center}
+
+/* Аврора-подсветка на фоне загрузки */
+.boot-aurora{position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:0;animation:aurora-fade 5s ease-in-out 0.2s infinite}
+.boot-aurora::before,.boot-aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(90px)}
+.boot-aurora::before{width:60%;height:60%;top:10%;left:5%;background:radial-gradient(circle,rgba(96,165,250,.35),transparent 70%);animation:aurora-move1 12s ease-in-out infinite}
+.boot-aurora::after{width:55%;height:55%;bottom:5%;right:8%;background:radial-gradient(circle,rgba(139,92,246,.3),transparent 70%);animation:aurora-move2 14s ease-in-out infinite}
+@keyframes aurora-fade{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes aurora-move1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.15)}}
+@keyframes aurora-move2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,-30px) scale(1.2)}}
+
+/* Ореолы вокруг загрузки */
+.boot-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(96,165,250,.15);transform:translate(-50%,-50%);pointer-events:none;z-index:2}
+.boot-ring.r1{width:60%;height:60%;animation:ring-pulse 3s ease-in-out infinite}
+.boot-ring.r2{width:80%;height:80%;border-color:rgba(139,92,246,.12);animation:ring-pulse 3s ease-in-out 0.5s infinite}
+.boot-ring.r3{width:100%;height:100%;border-color:rgba(236,72,153,.08);animation:ring-pulse 3s ease-in-out 1s infinite}
+@keyframes ring-pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.08);opacity:1}}
+
+/* Основной флэш при появлении лого */
+.boot-flash{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,rgba(147,197,253,.95) 20%,rgba(139,92,246,.6) 40%,transparent 65%);filter:blur(24px);transform:translate(-50%,-50%) scale(0);opacity:0;animation:flash-burst 1.8s cubic-bezier(.16,1,.3,1) 3.4s forwards;pointer-events:none;z-index:8}
+@keyframes flash-burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(3);opacity:1}45%{transform:translate(-50%,-50%) scale(12);opacity:.75}100%{transform:translate(-50%,-50%) scale(38);opacity:0}}
+
+/* Лучи при вспышке */
+.boot-rays{position:absolute;top:50%;left:50%;width:0;height:0;z-index:7;opacity:0;animation:rays-show 1.4s ease 3.4s forwards;pointer-events:none}
+.boot-rays::before,.boot-rays::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:0;background:linear-gradient(180deg,transparent,#fff,transparent);box-shadow:0 0 30px rgba(147,197,253,1);transform:translate(-50%,-50%) rotate(0deg)}
+.boot-rays::before{animation:ray-grow 1.5s cubic-bezier(.16,1,.3,1) 3.4s forwards}
+.boot-rays::after{transform:translate(-50%,-50%) rotate(90deg);animation:ray-grow 1.5s cubic-bezier(.16,1,.3,1) 3.5s forwards}
 @keyframes rays-show{to{opacity:1}}
-@keyframes ray-grow{0%{height:0;opacity:0}30%{opacity:1}100%{height:400px;opacity:0}}
-.person-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:person-exit .8s cubic-bezier(.6,0,.4,1) 3.3s forwards;z-index:3}
-@keyframes person-exit{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(.6)}}
-.person-svg{width:220px;height:320px;overflow:visible}
-.stick-floor{stroke:#475569;stroke-width:2.5;stroke-linecap:round;opacity:0;animation:fade-in-simple .5s ease .15s forwards}
-.stick-body,.stick-arm,.stick-leg{fill:none;stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.stick-body{stroke-dasharray:120;stroke-dashoffset:120;animation:draw-simple .5s cubic-bezier(.6,0,.4,1) .25s forwards}
-.stick-arm{stroke-dasharray:180;stroke-dashoffset:180;animation:draw-simple .5s cubic-bezier(.6,0,.4,1) .55s forwards}
-.stick-leg{stroke-dasharray:180;stroke-dashoffset:180;animation:draw-simple .5s cubic-bezier(.6,0,.4,1) .85s forwards}
+@keyframes ray-grow{0%{height:0;opacity:0}25%{opacity:1}100%{height:460px;opacity:0}}
+
+/* Человечек */
+.person-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:person-exit 1s cubic-bezier(.6,0,.4,1) 3.5s forwards;z-index:3}
+@keyframes person-exit{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(.55)}}
+.person-svg{width:240px;height:340px;overflow:visible;filter:drop-shadow(0 0 20px rgba(96,165,250,.15))}
+.stick-floor{stroke:#475569;stroke-width:2.5;stroke-linecap:round;opacity:0;animation:fade-in-simple .6s ease .15s forwards}
+.stick-body,.stick-arm,.stick-leg{fill:none;stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(203,213,225,.4))}
+.stick-body{stroke-dasharray:120;stroke-dashoffset:120;animation:draw-simple .6s cubic-bezier(.6,0,.4,1) .3s forwards}
+.stick-arm{stroke-dasharray:180;stroke-dashoffset:180;animation:draw-simple .6s cubic-bezier(.6,0,.4,1) .7s forwards}
+.stick-leg{stroke-dasharray:180;stroke-dashoffset:180;animation:draw-simple .6s cubic-bezier(.6,0,.4,1) 1.05s forwards}
 @keyframes draw-simple{to{stroke-dashoffset:0}}
 @keyframes fade-in-simple{to{opacity:1}}
-.stick-head{fill:none;stroke:#cbd5e1;stroke-width:3;stroke-dasharray:280;stroke-dashoffset:280;animation:draw-simple .8s cubic-bezier(.6,0,.4,1) 1.05s forwards}
-.head-group{transform-box:view-box;transform-origin:120px 130px;animation:head-story 2.4s cubic-bezier(.4,0,.2,1) 1.85s forwards}
-@keyframes head-story{0%{transform:rotate(0deg) translateY(0)}10%{transform:rotate(-22deg)}25%{transform:rotate(-22deg)}40%{transform:rotate(22deg)}55%{transform:rotate(22deg)}70%{transform:rotate(8deg) translateY(-4px)}85%{transform:rotate(-4deg) translateY(-16px)}100%{transform:rotate(-8deg) translateY(-22px)}}
-.eyes-normal{opacity:0;animation:fade-in-simple .3s ease 1.7s forwards}
-.eyes-surprised{opacity:0;transform-origin:120px 88px;transform-box:view-box;animation:eyes-pop .4s cubic-bezier(.34,1.56,.64,1) 3.05s forwards}
-@keyframes eyes-pop{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
-.mouth-normal{stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;opacity:0;animation:fade-in-simple .3s ease 1.75s forwards}
-.mouth-surprised{fill:#05060a;stroke:#cbd5e1;stroke-width:2.5;opacity:0;transform-origin:120px 110px;transform-box:view-box;animation:mouth-pop .45s cubic-bezier(.34,1.56,.64,1) 3.1s forwards}
-@keyframes mouth-pop{0%{opacity:0;transform:scale(.15)}60%{opacity:1;transform:scale(1.3)}100%{opacity:1;transform:scale(1)}}
-.surprise-mark{position:absolute;top:8%;right:22%;font-family:var(--mono);font-size:42px;font-weight:900;color:#93c5fd;opacity:0;filter:drop-shadow(0 0 24px rgba(147,197,253,1));pointer-events:none;z-index:5;animation:surprise-pop .7s cubic-bezier(.34,1.56,.64,1) 3.05s forwards}
-@keyframes surprise-pop{0%{opacity:0;transform:scale(0) rotate(-40deg)}60%{opacity:1;transform:scale(1.5) rotate(12deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-.code-sym{position:absolute;font-family:var(--mono);font-size:14px;color:#60a5fa;font-weight:800;opacity:0;text-shadow:0 0 14px rgba(96,165,250,1);pointer-events:none;z-index:4;animation:code-appear 1.5s cubic-bezier(.2,.8,.2,1) forwards}
-.code-sym:nth-child(2){animation-delay:2.9s}
-.code-sym:nth-child(3){animation-delay:2.95s}
-.code-sym:nth-child(4){animation-delay:3s}
-.code-sym:nth-child(5){animation-delay:3.05s}
-.code-sym:nth-child(6){animation-delay:2.92s}
-.code-sym:nth-child(7){animation-delay:2.98s}
-.code-sym:nth-child(8){animation-delay:3.02s}
-.code-sym:nth-child(9){animation-delay:3.06s}
-@keyframes code-appear{0%{opacity:0;transform:scale(.3) translateY(20px)}15%{opacity:1;transform:scale(1) translateY(0)}70%{opacity:1;transform:scale(1) translateY(-8px)}100%{opacity:0;transform:scale(.6) translateY(-50px)}}
-.boot-particle{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;opacity:0;pointer-events:none;z-index:6}
-.boot-particle:nth-child(1){background:#93c5fd;box-shadow:0 0 16px #93c5fd;--a:0deg;--d:380px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.25s forwards}
-.boot-particle:nth-child(2){background:#a78bfa;box-shadow:0 0 16px #a78bfa;--a:45deg;--d:420px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.28s forwards}
-.boot-particle:nth-child(3){background:#ec4899;box-shadow:0 0 16px #ec4899;--a:90deg;--d:360px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.32s forwards}
-.boot-particle:nth-child(4){background:#34d399;box-shadow:0 0 16px #34d399;--a:135deg;--d:400px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.35s forwards}
-.boot-particle:nth-child(5){background:#60a5fa;box-shadow:0 0 16px #60a5fa;--a:180deg;--d:380px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.25s forwards}
-.boot-particle:nth-child(6){background:#a78bfa;box-shadow:0 0 16px #a78bfa;--a:225deg;--d:420px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.3s forwards}
-.boot-particle:nth-child(7){background:#ec4899;box-shadow:0 0 16px #ec4899;--a:270deg;--d:360px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.32s forwards}
-.boot-particle:nth-child(8){background:#34d399;box-shadow:0 0 16px #34d399;--a:315deg;--d:400px;animation:fly 1.6s cubic-bezier(.16,1,.3,1) 3.35s forwards}
-@keyframes fly{0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) scale(0)}20%{opacity:1;transform:translate(-50%,-50%) rotate(var(--a)) translateX(40px) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(var(--d)) scale(0)}}
-.boot-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;animation:logo-bloom 1s cubic-bezier(.16,1,.3,1) 3.9s forwards;pointer-events:none;z-index:9}
-@keyframes logo-bloom{0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-15deg)}60%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
-.logo-draw{width:180px;height:180px;overflow:visible;position:relative;z-index:2}
+.stick-head{fill:none;stroke:#cbd5e1;stroke-width:3;stroke-dasharray:280;stroke-dashoffset:280;animation:draw-simple .9s cubic-bezier(.6,0,.4,1) 1.3s forwards;filter:drop-shadow(0 0 6px rgba(203,213,225,.6))}
+
+/* Движение головы: осмотр → удивление → вверх */
+.head-group{transform-box:view-box;transform-origin:120px 130px;animation:head-story 2.6s cubic-bezier(.45,0,.3,1) 2.2s forwards}
+@keyframes head-story{
+0%{transform:rotate(0deg) translateY(0)}
+8%{transform:rotate(-24deg) translateY(0)}
+22%{transform:rotate(-24deg) translateY(0)}
+36%{transform:rotate(24deg) translateY(0)}
+50%{transform:rotate(24deg) translateY(0)}
+62%{transform:rotate(10deg) translateY(-4px)}
+78%{transform:rotate(-2deg) translateY(-18px)}
+90%{transform:rotate(-8deg) translateY(-25px)}
+100%{transform:rotate(-8deg) translateY(-28px)}
+}
+
+.eyes-normal{opacity:0;animation:fade-in-simple .35s ease 2s forwards}
+.eyes-surprised{opacity:0;transform-origin:120px 88px;transform-box:view-box;animation:eyes-pop .5s cubic-bezier(.34,1.56,.64,1) 3.2s forwards}
+@keyframes eyes-pop{0%{opacity:0;transform:scale(.25)}60%{opacity:1;transform:scale(1.35)}100%{opacity:1;transform:scale(1)}}
+.mouth-normal{stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;opacity:0;animation:fade-in-simple .35s ease 2.05s forwards}
+.mouth-surprised{fill:#05060a;stroke:#cbd5e1;stroke-width:2.5;opacity:0;transform-origin:120px 110px;transform-box:view-box;animation:mouth-pop .55s cubic-bezier(.34,1.56,.64,1) 3.25s forwards}
+@keyframes mouth-pop{0%{opacity:0;transform:scale(.1)}60%{opacity:1;transform:scale(1.35)}100%{opacity:1;transform:scale(1)}}
+
+.surprise-mark{position:absolute;top:6%;right:20%;font-family:var(--mono);font-size:48px;font-weight:900;color:#93c5fd;opacity:0;filter:drop-shadow(0 0 30px rgba(147,197,253,1));pointer-events:none;z-index:5;animation:surprise-pop .9s cubic-bezier(.34,1.56,.64,1) 3.2s forwards}
+@keyframes surprise-pop{0%{opacity:0;transform:scale(0) rotate(-50deg)}55%{opacity:1;transform:scale(1.6) rotate(15deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+
+/* Плавающие символы */
+.code-sym{position:absolute;font-family:var(--mono);font-size:16px;color:#60a5fa;font-weight:800;opacity:0;text-shadow:0 0 18px rgba(96,165,250,1);pointer-events:none;z-index:4;animation:code-appear 1.8s cubic-bezier(.2,.8,.2,1) forwards}
+.code-sym:nth-child(2){animation-delay:3.05s}
+.code-sym:nth-child(3){animation-delay:3.12s}
+.code-sym:nth-child(4){animation-delay:3.19s}
+.code-sym:nth-child(5){animation-delay:3.26s}
+.code-sym:nth-child(6){animation-delay:3.08s}
+.code-sym:nth-child(7){animation-delay:3.15s}
+.code-sym:nth-child(8){animation-delay:3.22s}
+.code-sym:nth-child(9){animation-delay:3.29s}
+@keyframes code-appear{0%{opacity:0;transform:scale(.3) translateY(24px)}18%{opacity:1;transform:scale(1) translateY(0)}72%{opacity:1;transform:scale(1) translateY(-10px)}100%{opacity:0;transform:scale(.55) translateY(-60px)}}
+
+/* Частицы */
+.boot-particle{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;opacity:0;pointer-events:none;z-index:6;box-shadow:0 0 18px currentColor}
+.boot-particle:nth-child(1){color:#93c5fd;background:#93c5fd;--a:0deg;--d:420px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.4s forwards}
+.boot-particle:nth-child(2){color:#a78bfa;background:#a78bfa;--a:40deg;--d:460px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.44s forwards}
+.boot-particle:nth-child(3){color:#ec4899;background:#ec4899;--a:80deg;--d:400px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.48s forwards}
+.boot-particle:nth-child(4){color:#34d399;background:#34d399;--a:120deg;--d:440px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.52s forwards}
+.boot-particle:nth-child(5){color:#60a5fa;background:#60a5fa;--a:160deg;--d:420px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.4s forwards}
+.boot-particle:nth-child(6){color:#a78bfa;background:#a78bfa;--a:200deg;--d:460px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.46s forwards}
+.boot-particle:nth-child(7){color:#ec4899;background:#ec4899;--a:240deg;--d:400px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.48s forwards}
+.boot-particle:nth-child(8){color:#34d399;background:#34d399;--a:280deg;--d:440px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.52s forwards}
+.boot-particle:nth-child(9){color:#93c5fd;background:#93c5fd;--a:320deg;--d:420px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.42s forwards}
+.boot-particle:nth-child(10){color:#a78bfa;background:#a78bfa;--a:355deg;--d:460px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.44s forwards}
+@keyframes fly{0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) scale(0)}18%{opacity:1;transform:translate(-50%,-50%) rotate(var(--a)) translateX(50px) scale(1.5)}100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(var(--d)) scale(0)}}
+
+/* Лого */
+.boot-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;animation:logo-bloom 1.3s cubic-bezier(.16,1,.3,1) 4.2s forwards;pointer-events:none;z-index:9}
+@keyframes logo-bloom{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-20deg)}55%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(4deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
+.logo-draw{width:200px;height:200px;overflow:visible;position:relative;z-index:2}
 .logo-draw svg{width:100%;height:100%;overflow:visible}
-.logo-draw .line-path{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);animation:draw-line .9s cubic-bezier(.6,0,.4,1) forwards;filter:drop-shadow(0 0 12px currentColor)}
-.logo-draw .line-path:nth-child(1){animation-delay:4.1s;--len:200;stroke:#93c5fd;color:#93c5fd}
-.logo-draw .line-path:nth-child(2){animation-delay:4.2s;--len:200;stroke:#3b82f6;color:#3b82f6}
-.logo-draw .line-path:nth-child(3){animation-delay:4.3s;--len:100;stroke:#8b5cf6;color:#8b5cf6}
-.logo-draw .line-path:nth-child(4){animation-delay:4.4s;--len:50;stroke:#ec4899;color:#ec4899}
-.logo-draw .line-path:nth-child(5){animation-delay:4.5s;--len:30;stroke:#00d67a;color:#00d67a}
-.logo-draw .dot{fill:#3b82f6;r:0;animation:dot-pop .4s cubic-bezier(.34,1.56,.64,1) forwards;filter:drop-shadow(0 0 12px rgba(59,130,246,1))}
-.logo-draw .dot:nth-child(6){animation-delay:4.6s}
-.logo-draw .dot:nth-child(7){animation-delay:4.72s}
-.logo-draw .dot:nth-child(8){animation-delay:4.84s}
+.logo-draw .line-path{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);animation:draw-line 1s cubic-bezier(.6,0,.4,1) forwards;filter:drop-shadow(0 0 14px currentColor)}
+.logo-draw .line-path:nth-child(1){animation-delay:4.4s;--len:200;stroke:#93c5fd;color:#93c5fd}
+.logo-draw .line-path:nth-child(2){animation-delay:4.55s;--len:200;stroke:#3b82f6;color:#3b82f6}
+.logo-draw .line-path:nth-child(3){animation-delay:4.7s;--len:100;stroke:#8b5cf6;color:#8b5cf6}
+.logo-draw .line-path:nth-child(4){animation-delay:4.85s;--len:50;stroke:#ec4899;color:#ec4899}
+.logo-draw .line-path:nth-child(5){animation-delay:5s;--len:30;stroke:#00d67a;color:#00d67a}
+.logo-draw .dot{fill:#3b82f6;r:0;animation:dot-pop .5s cubic-bezier(.34,1.56,.64,1) forwards;filter:drop-shadow(0 0 14px rgba(59,130,246,1))}
+.logo-draw .dot:nth-child(6){animation-delay:5.15s}
+.logo-draw .dot:nth-child(7){animation-delay:5.28s}
+.logo-draw .dot:nth-child(8){animation-delay:5.41s}
 @keyframes draw-line{to{stroke-dashoffset:0}}
 @keyframes dot-pop{to{r:2.5}}
-.logo-halo{position:absolute;top:50%;left:50%;width:220px;height:220px;border-radius:50%;border:1px solid rgba(59,130,246,.28);transform:translate(-50%,-50%);opacity:0;animation:halo-in .6s ease 4.5s forwards,halo-spin 8s linear infinite 5.1s;pointer-events:none}
+
+.logo-halo{position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px solid rgba(59,130,246,.28);transform:translate(-50%,-50%);opacity:0;animation:halo-in .8s ease 5s forwards,halo-spin 10s linear infinite 5.8s;pointer-events:none}
 .logo-halo::before,.logo-halo::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(139,92,246,.28)}
-.logo-halo::before{inset:20px;animation:halo-spin 5s linear infinite reverse}
-.logo-halo::after{inset:40px;border-color:rgba(236,72,153,.28);animation:halo-spin 10s linear infinite}
+.logo-halo::before{inset:22px;animation:halo-spin 6s linear infinite reverse}
+.logo-halo::after{inset:44px;border-color:rgba(236,72,153,.28);animation:halo-spin 12s linear infinite}
 @keyframes halo-in{to{opacity:1}}
 @keyframes halo-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-.boot-text{position:absolute;bottom:9%;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:#3b82f6;opacity:0;animation:fade-in-simple .5s ease 4.7s forwards;white-space:nowrap;z-index:10}
+
+.boot-text{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.5em;text-transform:uppercase;color:#3b82f6;opacity:0;animation:fade-in-simple .6s ease 5.1s forwards;white-space:nowrap;z-index:10;text-shadow:0 0 12px rgba(59,130,246,.6)}
 
 /* CURSOR */
 .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);will-change:left,top}
@@ -112,10 +174,10 @@ button,input,textarea{font-family:inherit}
 [data-theme="light"] .bg-glow-2{background:radial-gradient(circle,rgba(139,92,246,.05),transparent 70%)}
 
 .container{max-width:1400px;margin:0 auto;padding:0 32px}
-@media(max-width:640px){.container{padding:0 14px}}
+@media(max-width:640px){.container{padding:0 12px}}
 
 /* TOPBAR */
-.topbar{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:4px;padding:5px;background:rgba(10,12,17,.75);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--line-2);border-radius:100px;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:topbar-in .8s cubic-bezier(.2,.8,.2,1) 5.2s backwards}
+.topbar{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:4px;padding:5px;background:rgba(10,12,17,.75);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--line-2);border-radius:100px;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:topbar-in .8s cubic-bezier(.2,.8,.2,1) 5.8s backwards}
 [data-theme="light"] .topbar{background:rgba(255,255,255,.85);border-color:rgba(0,0,0,.08)}
 @keyframes topbar-in{from{opacity:0;transform:translateX(-50%) translateY(-40px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .topbar.hidden{transform:translateX(-50%) translateY(-140%);opacity:0;pointer-events:none}
@@ -141,7 +203,7 @@ button,input,textarea{font-family:inherit}
 @media(max-width:900px){.topbar{top:10px;left:10px;right:10px;transform:none;justify-content:space-between;animation:none}.topbar.hidden{transform:translateY(-140%)}.topbar .nav-links{display:none}.topbar .brand-text{font-size:12px}}
 
 /* HERO */
-.hero{padding:110px 0 30px;animation:hero-fade .8s ease 5.2s backwards}
+.hero{padding:110px 0 30px;animation:hero-fade .8s ease 5.8s backwards}
 @keyframes hero-fade{from{opacity:0}to{opacity:1}}
 .hero-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:26px}
 .hero-badge{display:inline-flex;align-items:center;padding:5px 12px;background:var(--surface);border:1px solid var(--line-2);border-radius:100px;font-size:10.5px;color:var(--text-2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
@@ -173,25 +235,31 @@ button,input,textarea{font-family:inherit}
 
 /* JOURNAL */
 .journal-wrap{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;position:relative}
-.journal-scroll{overflow:auto;max-height:calc(100vh - 240px);position:relative}
+.journal-scroll{overflow:auto;max-height:calc(100vh - 240px);position:relative;-webkit-overflow-scrolling:touch}
 .journal-scroll::-webkit-scrollbar{width:10px;height:10px}
 .journal-scroll::-webkit-scrollbar-track{background:var(--bg-2)}
 .journal-scroll::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:100px;border:2px solid var(--bg-2)}
 .journal-scroll::-webkit-scrollbar-thumb:hover{background:var(--line-3)}
-table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%;table-layout:fixed}
-.jtable th,.jtable td{padding:0;text-align:center;border-right:1px solid var(--line);border-bottom:1px solid var(--line);height:44px;vertical-align:middle;font-size:12.5px}
+
+/* Градиент-подсказка прокрутки справа */
+.scroll-hint{position:absolute;top:0;right:0;bottom:0;width:40px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(15,17,22,.9));opacity:0;transition:opacity .3s;z-index:5;border-radius:0 20px 20px 0}
+[data-theme="light"] .scroll-hint{background:linear-gradient(90deg,transparent,rgba(255,255,255,.9))}
+.journal-wrap.show-hint .scroll-hint{opacity:1}
+
+table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+.jtable th,.jtable td{padding:0;text-align:center;border-right:1px solid var(--line);border-bottom:1px solid var(--line);height:var(--row-h);vertical-align:middle;font-size:12.5px}
 .jtable th:last-child,.jtable td:last-child{border-right:none}
 .jtable tbody tr:last-child td{border-bottom:none}
 .jtable thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);color:var(--text-3);font-weight:600;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;height:52px;padding:6px 4px;line-height:1.3}
-.jtable thead th.num-col{width:44px;min-width:44px}
-.jtable thead th.name-col{width:230px;min-width:230px;text-align:left;padding:6px 14px}
+.jtable thead th.num-col{width:var(--num-w);min-width:var(--num-w)}
+.jtable thead th.name-col{width:var(--name-w);min-width:var(--name-w);text-align:left;padding:6px 14px}
 .jtable th.sticky-col,.jtable td.sticky-col{position:sticky;left:0;z-index:3}
 .jtable thead th.sticky-col{z-index:4}
 .jtable td.sticky-col{background:var(--surface);border-right:1px solid var(--line-2)}
 .jtable thead th.sticky-col{background:var(--surface-2);border-right:1px solid var(--line-2)}
 .jtable td.num-cell{font-family:var(--mono);font-size:11px;color:var(--text-4);font-weight:600}
 .jtable td.name-cell{text-align:left;padding:6px 14px;font-weight:500;font-size:12.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.jtable thead th.date-col{width:52px;min-width:52px}
+.jtable thead th.date-col{width:var(--date-w);min-width:var(--date-w)}
 .jtable thead th.date-col .d-day{display:block;font-size:9.5px;color:var(--text-4);margin-bottom:2px;font-weight:500;letter-spacing:.06em}
 .jtable thead th.date-col .d-num{display:block;font-size:12px;color:var(--text-2);font-weight:700}
 .jtable thead th.date-col.today{color:var(--blue-hi)}
@@ -201,7 +269,7 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
 [data-theme="light"] .jtable tbody tr:nth-child(even) td:not(.sticky-col){background:rgba(0,0,0,.015)}
 .jtable tbody tr:hover td:not(.sticky-col){background:rgba(96,165,250,.05)}
 .jtable tbody tr:hover td.sticky-col{background:var(--surface-2)}
-.att-cell{width:100%;height:44px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:800;cursor:pointer;user-select:none;transition:background .15s;position:relative}
+.att-cell{width:100%;height:var(--row-h);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:800;cursor:pointer;user-select:none;transition:background .15s;position:relative;-webkit-tap-highlight-color:transparent}
 .att-cell.readonly{cursor:default}
 .att-cell.readonly:hover{background:transparent!important}
 .att-cell:hover{background:rgba(96,165,250,.08)}
@@ -212,6 +280,39 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
 .att-cell.aN:hover{background:rgba(255,59,71,.16)}
 .att-cell.aU:hover{background:rgba(0,214,122,.16)}
 .att-cell.aO:hover{background:rgba(139,92,246,.16)}
+
+/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
+[data-device="mobile"]{
+--name-w:130px;--date-w:40px;--num-w:36px;--row-h:40px
+}
+[data-device="mobile"] .jtable th,[data-device="mobile"] .jtable td{font-size:11.5px}
+[data-device="mobile"] .jtable thead th{font-size:9.5px;height:46px;letter-spacing:.04em;padding:4px 2px}
+[data-device="mobile"] .jtable thead th.date-col .d-day{font-size:8.5px}
+[data-device="mobile"] .jtable thead th.date-col .d-num{font-size:10.5px}
+[data-device="mobile"] .jtable td.name-cell{font-size:11.5px;padding:4px 10px;font-weight:600}
+[data-device="mobile"] .jtable td.num-cell{font-size:10px}
+[data-device="mobile"] .att-cell{font-size:12.5px}
+[data-device="mobile"] .att-cell.empty{font-size:10px}
+[data-device="mobile"] .hero{padding:90px 0 20px}
+[data-device="mobile"] .hero h1{font-size:38px}
+[data-device="mobile"] .hero-stat{padding:9px 14px;min-width:90px}
+[data-device="mobile"] .hero-stat .v{font-size:20px}
+[data-device="mobile"] .hero-stat .l{font-size:9px}
+[data-device="mobile"] .toolbar{padding:10px 12px;gap:8px}
+[data-device="mobile"] .month-label{min-width:140px;font-size:12px;padding:0 8px}
+[data-device="mobile"] .month-nav button{width:28px;height:28px}
+[data-device="mobile"] .toolbar .btn-today{padding:7px 12px;font-size:11.5px}
+[data-device="mobile"] .toolbar .count-info{font-size:10.5px;width:100%;order:5}
+[data-device="mobile"] .legend{padding:10px 12px;gap:6px}
+[data-device="mobile"] .legend-item{font-size:11px}
+[data-device="mobile"] .legend-item .dot{width:20px;height:20px;font-size:11px}
+[data-device="mobile"] .panel{padding:18px;border-radius:16px}
+[data-device="mobile"] .section-head{margin-bottom:18px}
+[data-device="mobile"] .hero-badge{font-size:9.5px}
+
+[data-device="tablet"]{
+--name-w:180px;--date-w:46px;--num-w:40px;--row-h:42px
+}
 
 /* PANEL */
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:20px}
@@ -234,7 +335,6 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
 .item.done{opacity:.5}
 .item.done .item-title{text-decoration:line-through}
 
-/* FOOTER */
 .footer{border-top:1px solid var(--line);padding:32px 0;margin-top:60px;text-align:center}
 .footer .copy{font-family:var(--mono);font-size:11.5px;color:var(--text-3);letter-spacing:.02em}
 
@@ -310,22 +410,28 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
 </head>
 <body>
 
+<!-- BOOT -->
 <div id="boot">
   <div class="boot-stage">
+    <div class="boot-aurora"></div>
+    <div class="boot-ring r1"></div>
+    <div class="boot-ring r2"></div>
+    <div class="boot-ring r3"></div>
     <div class="boot-flash"></div>
     <div class="boot-rays"></div>
     <div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div>
     <div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div>
+    <div class="boot-particle"></div><div class="boot-particle"></div>
     <div class="person-wrap">
       <div class="surprise-mark">!</div>
-      <div class="code-sym" style="top:22%;left:6%">&lt;/&gt;</div>
-      <div class="code-sym" style="top:38%;right:8%">{ }</div>
-      <div class="code-sym" style="top:12%;right:18%">01</div>
-      <div class="code-sym" style="top:68%;left:10%">#</div>
-      <div class="code-sym" style="top:28%;left:20%">$</div>
-      <div class="code-sym" style="top:58%;right:14%">0x</div>
-      <div class="code-sym" style="top:76%;right:22%">1010</div>
-      <div class="code-sym" style="top:18%;right:6%">;</div>
+      <div class="code-sym" style="top:20%;left:5%">&lt;/&gt;</div>
+      <div class="code-sym" style="top:36%;right:6%">{ }</div>
+      <div class="code-sym" style="top:10%;right:16%">01</div>
+      <div class="code-sym" style="top:66%;left:8%">#</div>
+      <div class="code-sym" style="top:26%;left:18%">$</div>
+      <div class="code-sym" style="top:56%;right:12%">0x</div>
+      <div class="code-sym" style="top:74%;right:20%">1010</div>
+      <div class="code-sym" style="top:16%;right:4%">;</div>
       <svg class="person-svg" viewBox="0 0 240 340" xmlns="http://www.w3.org/2000/svg">
         <line class="stick-floor" x1="40" y1="320" x2="200" y2="320"/>
         <line class="stick-body" x1="120" y1="140" x2="120" y2="240"/>
@@ -411,7 +517,7 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
       </div>
       <div class="hero-stats">
         <div class="hero-stat"><div class="v" id="hStudents">36</div><div class="l">Учеников</div></div>
-        <div class="hero-stat"><div class="v" id="hDays">0</div><div class="l">Учебных дней</div></div>
+        <div class="hero-stat"><div class="v" id="hDays">0</div><div class="l">Дней</div></div>
         <div class="hero-stat"><div class="v" id="hMarks">0</div><div class="l">Отметок</div></div>
       </div>
     </div>
@@ -427,20 +533,21 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
         <button onclick="nextMonth()" title="Следующий месяц"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
       <button class="btn-today" onclick="gotoToday()">Сегодня</button>
-      <button class="btn-today" onclick="openStudents()">Список учеников</button>
+      <button class="btn-today" onclick="openStudents()">Список</button>
       <div class="spacer"></div>
       <div class="count-info" id="countInfo">—</div>
     </div>
 
     <div class="legend">
       <span class="legend-title">Метки:</span>
-      <div class="legend-item"><span class="dot" style="background:rgba(255,59,71,.15);color:var(--red)">Н</span>Отсутствовал</div>
-      <div class="legend-item"><span class="dot" style="background:rgba(0,214,122,.15);color:var(--green)">У</span>Уважительная</div>
+      <div class="legend-item"><span class="dot" style="background:rgba(255,59,71,.15);color:var(--red)">Н</span>Нет</div>
+      <div class="legend-item"><span class="dot" style="background:rgba(0,214,122,.15);color:var(--green)">У</span>Уваж.</div>
       <div class="legend-item"><span class="dot" style="background:rgba(139,92,246,.15);color:var(--violet)">О</span>Опоздал</div>
-      <div class="legend-item"><span class="dot" style="background:var(--surface);color:var(--text-4)">·</span>Не отмечен</div>
+      <div class="legend-item"><span class="dot" style="background:var(--surface);color:var(--text-4)">·</span>—</div>
     </div>
 
-    <div class="journal-wrap">
+    <div class="journal-wrap" id="journalWrap">
+      <div class="scroll-hint"></div>
       <div class="journal-scroll" id="journalScroll">
         <table class="jtable" id="jtable"></table>
       </div>
@@ -479,7 +586,7 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
   <div class="modal wide">
     <button class="close" onclick="closeStudents()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     <div class="modal-head"><h3>Список учеников</h3><p id="studentsSubtitle">ОИБ 1-26</p></div>
-    <div id="studentsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:60vh;overflow-y:auto"></div>
+    <div id="studentsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;max-height:60vh;overflow-y:auto"></div>
   </div>
 </div>
 
@@ -507,13 +614,27 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;min-width:
 <div class="easter" id="easter"><h1>ACCESS GRANTED</h1><p>Konami code · Respect 🫡</p></div>
 
 <script>
-/* BOOT */
+/* ═══════ АВТО-ДЕТЕКТ УСТРОЙСТВА (скрытно) ═══════ */
+(function detectDevice(){
+  const ua = navigator.userAgent || '';
+  const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
+  const isTabletUA = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (isMobileUA && Math.min(screen.width, screen.height) >= 600);
+  const w = window.innerWidth;
+  let device = 'desktop';
+  if(isTabletUA || (w >= 600 && w < 1024)) device = 'tablet';
+  else if(isMobileUA || w < 600) device = 'mobile';
+  document.documentElement.setAttribute('data-device', device);
+  // Логируем тихо
+  console.log('%c[device] ' + device + ' (' + w + 'px)', 'color:#64748b;font-size:10px');
+})();
+
+/* ═══════ BOOT ═══════ */
 (function(){
   setTimeout(()=>{
     document.getElementById('boot').classList.add('done');
     document.body.style.overflow='';
     maybeShowCookie();
-  },5500);
+  },6000);
   document.body.style.overflow='hidden';
 })();
 function maybeShowCookie(){
@@ -527,7 +648,7 @@ function acceptCookies(){
   toast('Настройки сохранены');
 }
 
-/* CURSOR */
+/* ═══════ CURSOR ═══════ */
 (function(){
   const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
   if(!dot||!ring)return;
@@ -540,7 +661,7 @@ function acceptCookies(){
   });
 })();
 
-/* PARTICLES */
+/* ═══════ PARTICLES ═══════ */
 (function(){
   const c=document.getElementById('particles');if(!c)return;
   const ctx=c.getContext('2d');
@@ -568,13 +689,13 @@ function acceptCookies(){
   })();
 })();
 
-/* SCROLL */
+/* ═══════ SCROLL ═══════ */
 addEventListener('scroll',()=>{
   const topbar=document.getElementById('topbar');
   if(topbar)topbar.classList.toggle('hidden',scrollY>150);
 });
 
-/* THEME */
+/* ═══════ THEME ═══════ */
 function toggleTheme(){
   const cur=document.documentElement.getAttribute('data-theme')||'dark';
   const next=cur==='dark'?'light':'dark';
@@ -595,7 +716,7 @@ function updateThemeIcon(){
   updateThemeIcon();
 })();
 
-/* KEYBOARD */
+/* ═══════ KEYBOARD ═══════ */
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeLogin();closeStudents();document.getElementById('easter').classList.remove('active')}
 });
@@ -608,87 +729,57 @@ document.addEventListener('keydown',e=>{
   });
 })();
 
-/* ДАННЫЕ */
+/* ═══════ ДАННЫЕ ═══════ */
 const USERS={'учитру':{pass:'09091',name:'учитель'},'админ':{pass:'12345',name:'хозяин'}};
 const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const WEEKDAYS_SHORT=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
-// Список ФИО учеников ОИБ 1-26
 const STUDENTS = [
-  'Абулхадиров Сулейман Абдурахманович',
-  'Абрамова Ксения Игоревна',
-  'Авдеенко Егор Андреевич',
-  'Антипов Андрей Сергеевич',
-  'Бабкин Лев Артёмович',
-  'Баранов Артём Александрович',
-  'Басовская Виктория Максимовна',
-  'Вероников Матвей Алексеевич',
-  'Герасимова София Викторовна',
-  'Гончарова Мила Дмитриевна',
-  'Джавахова Софья Эльдаровна',
-  'Джафаров Артём Самсонович',
-  'Дьяконов Олег Павлович',
-  'Ерофеев Руслан Андреевич',
-  'Игнатенко Максим Сергеевич',
-  'Игнатов Илья Викторович',
-  'Инин Святослав Афиногенович',
-  'Кабарелина Элина Сергеевна',
-  'Ковалёв Вадим Владимирович',
-  'Конюх Михаил Алексеевич',
-  'Кузюменко Татьяна Олеговна',
-  'Курсов Владислав Ильич',
-  'Лем Александр Русланович',
-  'Мусаелян Виктория Арменовна',
-  'Медведев Виталий Станиславович',
-  'Нестеров Антон Андреевич',
-  'Панфилов Даниил Александрович',
-  'Пономарёв Олег Владимирович',
-  'Родин Роман Денисович',
-  'Роухин Дмитрий Максимович',
-  'Святенко Артём Игоревич',
-  'Силенков Тимофей Андреевич',
-  'Скачков Денис Алексеевич',
-  'Титаренко Павел Кириллович',
-  'Чиликин Вадим Владимирович',
-  'Чинчаров Шахрудин Исаевич'
+'Абулхадиров Сулейман Абдурахманович',
+'Абрамова Ксения Игоревна',
+'Авдеенко Егор Андреевич',
+'Антипов Андрей Сергеевич',
+'Бабкин Лев Артёмович',
+'Баранов Артём Александрович',
+'Басовская Виктория Максимовна',
+'Вероников Матвей Алексеевич',
+'Герасимова София Викторовна',
+'Гончарова Мила Дмитриевна',
+'Джавахова Софья Эльдаровна',
+'Джафаров Артём Самсонович',
+'Дьяконов Олег Павлович',
+'Ерофеев Руслан Андреевич',
+'Игнатенко Максим Сергеевич',
+'Игнатов Илья Викторович',
+'Инин Святослав Афиногенович',
+'Кабарелина Элина Сергеевна',
+'Ковалёв Вадим Владимирович',
+'Конюх Михаил Алексеевич',
+'Кузюменко Татьяна Олеговна',
+'Курсов Владислав Ильич',
+'Лем Александр Русланович',
+'Мусаелян Виктория Арменовна',
+'Медведев Виталий Станиславович',
+'Нестеров Антон Андреевич',
+'Панфилов Даниил Александрович',
+'Пономарёв Олег Владимирович',
+'Родин Роман Денисович',
+'Роухин Дмитрий Максимович',
+'Святенко Артём Игоревич',
+'Силенков Тимофей Андреевич',
+'Скачков Денис Алексеевич',
+'Титаренко Павел Кириллович',
+'Чиликин Вадим Владимирович',
+'Чинчаров Шахрудин Исаевич'
 ];
 
-// Предзаполненная посещаемость за сентябрь 2026
-// Данные из сообщений старосты
 const PREFILL = {
-  '2026-09-03': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У'
-  },
-  '2026-09-05': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У',
-    'Абулхадиров Сулейман Абдурахманович': 'У',
-    'Джафаров Артём Самсонович': 'У',
-    'Родин Роман Денисович': 'У'
-  },
-  '2026-09-07': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У',
-    'Басовская Виктория Максимовна': 'У'
-  },
-  '2026-09-08': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У'
-  },
-  '2026-09-09': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У',
-    'Родин Роман Денисович': 'У',
-    'Джафаров Артём Самсонович': 'У'
-  },
-  '2026-09-10': {
-    'Антипов Андрей Сергеевич': 'Н',
-    'Ерофеев Руслан Андреевич': 'У',
-    'Абулхадиров Сулейман Абдурахманович': 'У',
-    'Джафаров Артём Самсонович': 'У',
-    'Титаренко Павел Кириллович': 'У'
-  }
+'2026-09-03': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У'},
+'2026-09-05': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У','Абулхадиров Сулейман Абдурахманович':'У','Джафаров Артём Самсонович':'У','Родин Роман Денисович':'У'},
+'2026-09-07': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У','Басовская Виктория Максимовна':'У'},
+'2026-09-08': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У'},
+'2026-09-09': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У','Родин Роман Денисович':'У','Джафаров Артём Самсонович':'У'},
+'2026-09-10': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У','Абулхадиров Сулейман Абдурахманович':'У','Джафаров Артём Самсонович':'У','Титаренко Павел Кириллович':'У'}
 };
 
 let data = {
@@ -706,11 +797,21 @@ let curStudents = [];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 function isTeacher(){return currentRole!==null}
+function getDevice(){return document.documentElement.getAttribute('data-device')||'desktop'}
 
-// Короткое ФИО для таблицы: "Фамилия Имя"
-function shortName(fio){
+// Адаптивное отображение имени
+function displayName(fio){
   const parts = fio.trim().split(/\s+/);
+  const dev = getDevice();
   if(parts.length < 2) return fio;
+  if(dev === 'mobile'){
+    // Фамилия + первая буква имени
+    return parts[0] + ' ' + parts[1].charAt(0) + '.';
+  }
+  if(dev === 'tablet'){
+    return parts[0] + ' ' + parts[1];
+  }
+  // desktop — фамилия + имя
   return parts[0] + ' ' + parts[1];
 }
 
@@ -733,8 +834,7 @@ function getWorkingDays(year,month){
   const d=new Date(year,month,1);
   while(d.getMonth()===month){
     const dow=d.getDay();
-    // Пн-Сб (пропускаем только воскресенье)
-    if(dow!==0){
+    if(dow!==0){ // Пн-Сб (пропускаем воскресенье)
       const iso=`${year}-${String(month+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       days.push({iso, day:d.getDate(), month:month+1, dow:dow});
     }
@@ -752,7 +852,7 @@ function renderJournal(){
 
   const todayIso = new Date().toISOString().slice(0,10);
   const todayIn = dates.some(d => d.iso === todayIso);
-  document.getElementById('countInfo').innerHTML = `<b>${dates.length}</b> раб. дней · <b>${curStudents.length}</b> учеников${todayIn?' · <b style="color:var(--blue-hi)">сегодня в списке</b>':''}`;
+  document.getElementById('countInfo').innerHTML = `<b>${dates.length}</b> дн. · <b>${curStudents.length}</b> чел.${todayIn?' · <b style="color:var(--blue-hi)">сегодня в списке</b>':''}`;
 
   let thead = '<thead><tr>';
   thead += '<th class="sticky-col num-col">№</th>';
@@ -770,7 +870,7 @@ function renderJournal(){
   curStudents.forEach((student, idx) => {
     tbody += '<tr>';
     tbody += `<td class="sticky-col num-cell">${String(idx+1).padStart(2,'0')}</td>`;
-    tbody += `<td class="sticky-col name-cell" title="${esc(student)}">${esc(shortName(student))}</td>`;
+    tbody += `<td class="sticky-col name-cell" title="${esc(student)}">${esc(displayName(student))}</td>`;
     dates.forEach(d => {
       const val = (data.attendance[d.iso] && data.attendance[d.iso][student]) || '';
       const cls = val==='Н'?'aN':val==='У'?'aU':val==='О'?'aO':'empty';
@@ -784,7 +884,25 @@ function renderJournal(){
 
   document.getElementById('jtable').innerHTML = thead + tbody;
   updateHeroStats(dates);
+  updateScrollHint();
 }
+
+/* Показ градиента-подсказки справа если можно скроллить */
+function updateScrollHint(){
+  const scroll = document.getElementById('journalScroll');
+  const wrap = document.getElementById('journalWrap');
+  if(!scroll || !wrap) return;
+  const canScroll = scroll.scrollWidth > scroll.clientWidth + 10;
+  wrap.classList.toggle('show-hint', canScroll && getDevice() === 'mobile');
+}
+document.getElementById('journalScroll').addEventListener('scroll', ()=>{
+  const scroll = document.getElementById('journalScroll');
+  const wrap = document.getElementById('journalWrap');
+  if(!scroll || !wrap) return;
+  const atEnd = scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 20;
+  if(atEnd) wrap.classList.remove('show-hint');
+  else if(getDevice() === 'mobile') wrap.classList.add('show-hint');
+});
 
 function updateHeroStats(dates){
   document.getElementById('hStudents').textContent = curStudents.length;
@@ -840,7 +958,7 @@ function gotoToday(){
 function openStudents(){
   const el=document.getElementById('studentsList');
   document.getElementById('studentsSubtitle').textContent='ОИБ 1-26 · '+curStudents.length+' человек';
-  el.innerHTML=curStudents.map((s,i)=>`<div class="student-item" style="padding:11px 12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;gap:10px"><span style="color:var(--blue-hi);font-size:10.5px;font-weight:700">${String(i+1).padStart(2,'0')}</span><span>${esc(s)}</span></div>`).join('');
+  el.innerHTML=curStudents.map((s,i)=>`<div class="student-item" style="padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-family:var(--mono);font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:10px"><span style="color:var(--blue-hi);font-size:10px;font-weight:700;min-width:22px">${String(i+1).padStart(2,'0')}</span><span>${esc(s)}</span></div>`).join('');
   document.getElementById('studentsModal').classList.add('active');
 }
 function closeStudents(){document.getElementById('studentsModal').classList.remove('active')}
@@ -898,7 +1016,7 @@ function renderAdmin(){
     <div class="admin-section">
       <h4>Очистка данных</h4>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="add-btn" style="width:auto;padding:9px 16px;border-style:solid;border-color:rgba(255,59,71,.3);color:var(--red)" onclick="clearMonth()">Очистить текущий месяц</button>
+        <button class="add-btn" style="width:auto;padding:9px 16px;border-style:solid;border-color:rgba(255,59,71,.3);color:var(--red)" onclick="clearMonth()">Очистить месяц</button>
         <button class="add-btn" style="width:auto;padding:9px 16px;border-style:solid;border-color:rgba(255,59,71,.3);color:var(--red)" onclick="clearAll()">Очистить всё</button>
       </div>
     </div>
@@ -918,7 +1036,7 @@ function clearMonth(){
   saveToStorage();renderJournal();toast('Месяц очищен');
 }
 function clearAll(){
-  if(!confirm('Очистить ВСЕ отметки посещаемости?'))return;
+  if(!confirm('Очистить ВСЕ отметки?'))return;
   data.attendance={};saveToStorage();renderJournal();toast('Всё очищено');
 }
 
@@ -943,7 +1061,7 @@ function exportData(){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='oib-1-26-attendance-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  a.href=url;a.download='oib-1-26-'+new Date().toISOString().slice(0,10)+'.json';a.click();
   URL.revokeObjectURL(url);toast('Бэкап скачан');
 }
 function importData(){
@@ -998,7 +1116,28 @@ function renderNotes(){
   }
 }
 
-/* СТАРТ */
+/* ═══════ ПЕРЕРИСОВКА ПРИ ИЗМЕНЕНИИ РАЗМЕРА / ОРИЕНТАЦИИ ═══════ */
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=>{
+    const w = window.innerWidth;
+    const ua = navigator.userAgent || '';
+    const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
+    const isTabletUA = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (isMobileUA && Math.min(screen.width, screen.height) >= 600);
+    let device = 'desktop';
+    if(isTabletUA || (w >= 600 && w < 1024)) device = 'tablet';
+    else if(isMobileUA || w < 600) device = 'mobile';
+    const oldDevice = document.documentElement.getAttribute('data-device');
+    if(oldDevice !== device){
+      document.documentElement.setAttribute('data-device', device);
+      renderJournal();
+    }
+    updateScrollHint();
+  }, 150);
+});
+
+/* ═══════ СТАРТ ═══════ */
 (function init(){
   const now=new Date();
   curYear=now.getFullYear();
@@ -1009,7 +1148,7 @@ function renderNotes(){
   renderNotes();
 })();
 
-console.log('%cОИБ 1-26 · Журнал посещаемости v19.0','color:#60a5fa;font-weight:900;font-size:16px');
+console.log('%cОИБ 1-26 · Журнал посещаемости v20.0','color:#60a5fa;font-weight:900;font-size:16px');
 console.log('%cВход: УчитРУ / 09091','color:#a78bfa');
 </script>
 </body>
