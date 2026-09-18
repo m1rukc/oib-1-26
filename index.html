@@ -28,14 +28,13 @@
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased;letter-spacing:-.011em;transition:background .4s ease,color .4s ease}
 @media(max-width:960px){body{cursor:auto}}
+html[data-device="mobile"] body,html[data-device="tablet"] body{cursor:auto}
 button,input,textarea{font-family:inherit}
 
-/* ═══════ BOOT — улучшенная анимация ═══════ */
-#boot{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 45%,#0a0d18 0%,#000 70%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity 1.2s cubic-bezier(.4,0,.2,1),visibility 1.2s ease}
+/* BOOT */
+#boot{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 45%,#0a0d18 0%,#000 70%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;transition:opacity 1s cubic-bezier(.4,0,.2,1),visibility 1s ease}
 #boot.done{opacity:0;visibility:hidden;pointer-events:none}
 .boot-stage{position:relative;width:min(520px,94vw);height:min(520px,94vw);display:flex;align-items:center;justify-content:center}
-
-/* Аврора-подсветка на фоне загрузки */
 .boot-aurora{position:absolute;inset:-50%;z-index:1;pointer-events:none;opacity:0;animation:aurora-fade 5s ease-in-out 0.2s infinite}
 .boot-aurora::before,.boot-aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(90px)}
 .boot-aurora::before{width:60%;height:60%;top:10%;left:5%;background:radial-gradient(circle,rgba(96,165,250,.35),transparent 70%);animation:aurora-move1 12s ease-in-out infinite}
@@ -43,27 +42,19 @@ button,input,textarea{font-family:inherit}
 @keyframes aurora-fade{0%,100%{opacity:.5}50%{opacity:1}}
 @keyframes aurora-move1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.15)}}
 @keyframes aurora-move2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,-30px) scale(1.2)}}
-
-/* Ореолы вокруг загрузки */
 .boot-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(96,165,250,.15);transform:translate(-50%,-50%);pointer-events:none;z-index:2}
 .boot-ring.r1{width:60%;height:60%;animation:ring-pulse 3s ease-in-out infinite}
 .boot-ring.r2{width:80%;height:80%;border-color:rgba(139,92,246,.12);animation:ring-pulse 3s ease-in-out 0.5s infinite}
 .boot-ring.r3{width:100%;height:100%;border-color:rgba(236,72,153,.08);animation:ring-pulse 3s ease-in-out 1s infinite}
 @keyframes ring-pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.08);opacity:1}}
-
-/* Основной флэш при появлении лого */
 .boot-flash{position:absolute;top:50%;left:50%;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,rgba(147,197,253,.95) 20%,rgba(139,92,246,.6) 40%,transparent 65%);filter:blur(24px);transform:translate(-50%,-50%) scale(0);opacity:0;animation:flash-burst 1.8s cubic-bezier(.16,1,.3,1) 3.4s forwards;pointer-events:none;z-index:8}
 @keyframes flash-burst{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%{transform:translate(-50%,-50%) scale(3);opacity:1}45%{transform:translate(-50%,-50%) scale(12);opacity:.75}100%{transform:translate(-50%,-50%) scale(38);opacity:0}}
-
-/* Лучи при вспышке */
 .boot-rays{position:absolute;top:50%;left:50%;width:0;height:0;z-index:7;opacity:0;animation:rays-show 1.4s ease 3.4s forwards;pointer-events:none}
 .boot-rays::before,.boot-rays::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:0;background:linear-gradient(180deg,transparent,#fff,transparent);box-shadow:0 0 30px rgba(147,197,253,1);transform:translate(-50%,-50%) rotate(0deg)}
 .boot-rays::before{animation:ray-grow 1.5s cubic-bezier(.16,1,.3,1) 3.4s forwards}
 .boot-rays::after{transform:translate(-50%,-50%) rotate(90deg);animation:ray-grow 1.5s cubic-bezier(.16,1,.3,1) 3.5s forwards}
 @keyframes rays-show{to{opacity:1}}
 @keyframes ray-grow{0%{height:0;opacity:0}25%{opacity:1}100%{height:460px;opacity:0}}
-
-/* Человечек */
 .person-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:person-exit 1s cubic-bezier(.6,0,.4,1) 3.5s forwards;z-index:3}
 @keyframes person-exit{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(.55)}}
 .person-svg{width:240px;height:340px;overflow:visible;filter:drop-shadow(0 0 20px rgba(96,165,250,.15))}
@@ -75,32 +66,16 @@ button,input,textarea{font-family:inherit}
 @keyframes draw-simple{to{stroke-dashoffset:0}}
 @keyframes fade-in-simple{to{opacity:1}}
 .stick-head{fill:none;stroke:#cbd5e1;stroke-width:3;stroke-dasharray:280;stroke-dashoffset:280;animation:draw-simple .9s cubic-bezier(.6,0,.4,1) 1.3s forwards;filter:drop-shadow(0 0 6px rgba(203,213,225,.6))}
-
-/* Движение головы: осмотр → удивление → вверх */
-.head-group{transform-box:view-box;transform-origin:120px 130px;animation:head-story 2.6s cubic-bezier(.45,0,.3,1) 2.2s forwards}
-@keyframes head-story{
-0%{transform:rotate(0deg) translateY(0)}
-8%{transform:rotate(-24deg) translateY(0)}
-22%{transform:rotate(-24deg) translateY(0)}
-36%{transform:rotate(24deg) translateY(0)}
-50%{transform:rotate(24deg) translateY(0)}
-62%{transform:rotate(10deg) translateY(-4px)}
-78%{transform:rotate(-2deg) translateY(-18px)}
-90%{transform:rotate(-8deg) translateY(-25px)}
-100%{transform:rotate(-8deg) translateY(-28px)}
-}
-
+.head-group{transform-box:fill-box;transform-origin:50% 55%;animation:head-story 2.6s cubic-bezier(.45,0,.3,1) 2.2s forwards}
+@keyframes head-story{0%{transform:rotate(0deg) translateY(0)}8%{transform:rotate(-24deg)}22%{transform:rotate(-24deg)}36%{transform:rotate(24deg)}50%{transform:rotate(24deg)}62%{transform:rotate(10deg) translateY(-4px)}78%{transform:rotate(-2deg) translateY(-18px)}100%{transform:rotate(-8deg) translateY(-28px)}}
 .eyes-normal{opacity:0;animation:fade-in-simple .35s ease 2s forwards}
-.eyes-surprised{opacity:0;transform-origin:120px 88px;transform-box:view-box;animation:eyes-pop .5s cubic-bezier(.34,1.56,.64,1) 3.2s forwards}
+.eyes-surprised{opacity:0;transform-origin:center;transform-box:fill-box;animation:eyes-pop .5s cubic-bezier(.34,1.56,.64,1) 3.2s forwards}
 @keyframes eyes-pop{0%{opacity:0;transform:scale(.25)}60%{opacity:1;transform:scale(1.35)}100%{opacity:1;transform:scale(1)}}
 .mouth-normal{stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;opacity:0;animation:fade-in-simple .35s ease 2.05s forwards}
-.mouth-surprised{fill:#05060a;stroke:#cbd5e1;stroke-width:2.5;opacity:0;transform-origin:120px 110px;transform-box:view-box;animation:mouth-pop .55s cubic-bezier(.34,1.56,.64,1) 3.25s forwards}
+.mouth-surprised{fill:#05060a;stroke:#cbd5e1;stroke-width:2.5;opacity:0;transform-origin:center;transform-box:fill-box;animation:mouth-pop .55s cubic-bezier(.34,1.56,.64,1) 3.25s forwards}
 @keyframes mouth-pop{0%{opacity:0;transform:scale(.1)}60%{opacity:1;transform:scale(1.35)}100%{opacity:1;transform:scale(1)}}
-
 .surprise-mark{position:absolute;top:6%;right:20%;font-family:var(--mono);font-size:48px;font-weight:900;color:#93c5fd;opacity:0;filter:drop-shadow(0 0 30px rgba(147,197,253,1));pointer-events:none;z-index:5;animation:surprise-pop .9s cubic-bezier(.34,1.56,.64,1) 3.2s forwards}
 @keyframes surprise-pop{0%{opacity:0;transform:scale(0) rotate(-50deg)}55%{opacity:1;transform:scale(1.6) rotate(15deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-
-/* Плавающие символы */
 .code-sym{position:absolute;font-family:var(--mono);font-size:16px;color:#60a5fa;font-weight:800;opacity:0;text-shadow:0 0 18px rgba(96,165,250,1);pointer-events:none;z-index:4;animation:code-appear 1.8s cubic-bezier(.2,.8,.2,1) forwards}
 .code-sym:nth-child(2){animation-delay:3.05s}
 .code-sym:nth-child(3){animation-delay:3.12s}
@@ -111,8 +86,6 @@ button,input,textarea{font-family:inherit}
 .code-sym:nth-child(8){animation-delay:3.22s}
 .code-sym:nth-child(9){animation-delay:3.29s}
 @keyframes code-appear{0%{opacity:0;transform:scale(.3) translateY(24px)}18%{opacity:1;transform:scale(1) translateY(0)}72%{opacity:1;transform:scale(1) translateY(-10px)}100%{opacity:0;transform:scale(.55) translateY(-60px)}}
-
-/* Частицы */
 .boot-particle{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;opacity:0;pointer-events:none;z-index:6;box-shadow:0 0 18px currentColor}
 .boot-particle:nth-child(1){color:#93c5fd;background:#93c5fd;--a:0deg;--d:420px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.4s forwards}
 .boot-particle:nth-child(2){color:#a78bfa;background:#a78bfa;--a:40deg;--d:460px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.44s forwards}
@@ -125,8 +98,6 @@ button,input,textarea{font-family:inherit}
 .boot-particle:nth-child(9){color:#93c5fd;background:#93c5fd;--a:320deg;--d:420px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.42s forwards}
 .boot-particle:nth-child(10){color:#a78bfa;background:#a78bfa;--a:355deg;--d:460px;animation:fly 2s cubic-bezier(.16,1,.3,1) 3.44s forwards}
 @keyframes fly{0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) scale(0)}18%{opacity:1;transform:translate(-50%,-50%) rotate(var(--a)) translateX(50px) scale(1.5)}100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--a)) translateX(var(--d)) scale(0)}}
-
-/* Лого */
 .boot-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;animation:logo-bloom 1.3s cubic-bezier(.16,1,.3,1) 4.2s forwards;pointer-events:none;z-index:9}
 @keyframes logo-bloom{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(-20deg)}55%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(4deg)}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}}
 .logo-draw{width:200px;height:200px;overflow:visible;position:relative;z-index:2}
@@ -143,14 +114,12 @@ button,input,textarea{font-family:inherit}
 .logo-draw .dot:nth-child(8){animation-delay:5.41s}
 @keyframes draw-line{to{stroke-dashoffset:0}}
 @keyframes dot-pop{to{r:2.5}}
-
 .logo-halo{position:absolute;top:50%;left:50%;width:240px;height:240px;border-radius:50%;border:1px solid rgba(59,130,246,.28);transform:translate(-50%,-50%);opacity:0;animation:halo-in .8s ease 5s forwards,halo-spin 10s linear infinite 5.8s;pointer-events:none}
 .logo-halo::before,.logo-halo::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(139,92,246,.28)}
 .logo-halo::before{inset:22px;animation:halo-spin 6s linear infinite reverse}
 .logo-halo::after{inset:44px;border-color:rgba(236,72,153,.28);animation:halo-spin 12s linear infinite}
 @keyframes halo-in{to{opacity:1}}
 @keyframes halo-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-
 .boot-text{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.5em;text-transform:uppercase;color:#3b82f6;opacity:0;animation:fade-in-simple .6s ease 5.1s forwards;white-space:nowrap;z-index:10;text-shadow:0 0 12px rgba(59,130,246,.6)}
 
 /* CURSOR */
@@ -161,6 +130,7 @@ button,input,textarea{font-family:inherit}
 [data-theme="light"] .cursor-ring{border-color:rgba(0,0,0,.2)}
 .cursor-ring.hover{width:52px;height:52px;border-color:rgba(96,165,250,.55);background:rgba(59,130,246,.07)}
 @media(max-width:960px){.cursor-dot,.cursor-ring{display:none}}
+html[data-device="mobile"] .cursor-dot,html[data-device="mobile"] .cursor-ring,html[data-device="tablet"] .cursor-dot,html[data-device="tablet"] .cursor-ring{display:none}
 
 /* BG */
 .bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
@@ -240,13 +210,12 @@ button,input,textarea{font-family:inherit}
 .journal-scroll::-webkit-scrollbar-track{background:var(--bg-2)}
 .journal-scroll::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:100px;border:2px solid var(--bg-2)}
 .journal-scroll::-webkit-scrollbar-thumb:hover{background:var(--line-3)}
-
-/* Градиент-подсказка прокрутки справа */
-.scroll-hint{position:absolute;top:0;right:0;bottom:0;width:40px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(15,17,22,.9));opacity:0;transition:opacity .3s;z-index:5;border-radius:0 20px 20px 0}
+.scroll-hint{position:absolute;top:0;right:0;bottom:0;width:40px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(15,17,22,.9));opacity:0;transition:opacity .3s;z-index:5}
 [data-theme="light"] .scroll-hint{background:linear-gradient(90deg,transparent,rgba(255,255,255,.9))}
 .journal-wrap.show-hint .scroll-hint{opacity:1}
 
-table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+/* ТАБЛИЦА — ИСПРАВЛЕНО: добавлен width */
+table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;width:100%;min-width:max-content}
 .jtable th,.jtable td{padding:0;text-align:center;border-right:1px solid var(--line);border-bottom:1px solid var(--line);height:var(--row-h);vertical-align:middle;font-size:12.5px}
 .jtable th:last-child,.jtable td:last-child{border-right:none}
 .jtable tbody tr:last-child td{border-bottom:none}
@@ -281,38 +250,32 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layo
 .att-cell.aU:hover{background:rgba(0,214,122,.16)}
 .att-cell.aO:hover{background:rgba(139,92,246,.16)}
 
-/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
-[data-device="mobile"]{
---name-w:130px;--date-w:40px;--num-w:36px;--row-h:40px
-}
-[data-device="mobile"] .jtable th,[data-device="mobile"] .jtable td{font-size:11.5px}
-[data-device="mobile"] .jtable thead th{font-size:9.5px;height:46px;letter-spacing:.04em;padding:4px 2px}
-[data-device="mobile"] .jtable thead th.date-col .d-day{font-size:8.5px}
-[data-device="mobile"] .jtable thead th.date-col .d-num{font-size:10.5px}
-[data-device="mobile"] .jtable td.name-cell{font-size:11.5px;padding:4px 10px;font-weight:600}
-[data-device="mobile"] .jtable td.num-cell{font-size:10px}
-[data-device="mobile"] .att-cell{font-size:12.5px}
-[data-device="mobile"] .att-cell.empty{font-size:10px}
-[data-device="mobile"] .hero{padding:90px 0 20px}
-[data-device="mobile"] .hero h1{font-size:38px}
-[data-device="mobile"] .hero-stat{padding:9px 14px;min-width:90px}
-[data-device="mobile"] .hero-stat .v{font-size:20px}
-[data-device="mobile"] .hero-stat .l{font-size:9px}
-[data-device="mobile"] .toolbar{padding:10px 12px;gap:8px}
-[data-device="mobile"] .month-label{min-width:140px;font-size:12px;padding:0 8px}
-[data-device="mobile"] .month-nav button{width:28px;height:28px}
-[data-device="mobile"] .toolbar .btn-today{padding:7px 12px;font-size:11.5px}
-[data-device="mobile"] .toolbar .count-info{font-size:10.5px;width:100%;order:5}
-[data-device="mobile"] .legend{padding:10px 12px;gap:6px}
-[data-device="mobile"] .legend-item{font-size:11px}
-[data-device="mobile"] .legend-item .dot{width:20px;height:20px;font-size:11px}
-[data-device="mobile"] .panel{padding:18px;border-radius:16px}
-[data-device="mobile"] .section-head{margin-bottom:18px}
-[data-device="mobile"] .hero-badge{font-size:9.5px}
-
-[data-device="tablet"]{
---name-w:180px;--date-w:46px;--num-w:40px;--row-h:42px
-}
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+html[data-device="mobile"]{--name-w:120px;--date-w:38px;--num-w:34px;--row-h:40px}
+html[data-device="mobile"] .jtable th,html[data-device="mobile"] .jtable td{font-size:11.5px}
+html[data-device="mobile"] .jtable thead th{font-size:9.5px;height:46px;letter-spacing:.04em;padding:4px 2px}
+html[data-device="mobile"] .jtable thead th.date-col .d-day{font-size:8.5px}
+html[data-device="mobile"] .jtable thead th.date-col .d-num{font-size:10.5px}
+html[data-device="mobile"] .jtable td.name-cell{font-size:11.5px;padding:4px 8px;font-weight:600}
+html[data-device="mobile"] .jtable td.num-cell{font-size:10px}
+html[data-device="mobile"] .att-cell{font-size:12.5px}
+html[data-device="mobile"] .att-cell.empty{font-size:10px}
+html[data-device="mobile"] .hero{padding:90px 0 20px}
+html[data-device="mobile"] .hero h1{font-size:38px}
+html[data-device="mobile"] .hero-stat{padding:9px 14px;min-width:90px}
+html[data-device="mobile"] .hero-stat .v{font-size:20px}
+html[data-device="mobile"] .hero-stat .l{font-size:9px}
+html[data-device="mobile"] .toolbar{padding:10px 12px;gap:8px}
+html[data-device="mobile"] .month-label{min-width:140px;font-size:12px;padding:0 8px}
+html[data-device="mobile"] .month-nav button{width:28px;height:28px}
+html[data-device="mobile"] .toolbar .btn-today{padding:7px 12px;font-size:11.5px}
+html[data-device="mobile"] .toolbar .count-info{font-size:10.5px;width:100%;order:5}
+html[data-device="mobile"] .legend{padding:10px 12px;gap:6px}
+html[data-device="mobile"] .legend-item{font-size:11px}
+html[data-device="mobile"] .legend-item .dot{width:20px;height:20px;font-size:11px}
+html[data-device="mobile"] .panel{padding:18px;border-radius:16px}
+html[data-device="mobile"] .hero-badge{font-size:9.5px}
+html[data-device="tablet"]{--name-w:180px;--date-w:46px;--num-w:40px;--row-h:42px}
 
 /* PANEL */
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:20px}
@@ -410,7 +373,6 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layo
 </head>
 <body>
 
-<!-- BOOT -->
 <div id="boot">
   <div class="boot-stage">
     <div class="boot-aurora"></div>
@@ -614,8 +576,8 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layo
 <div class="easter" id="easter"><h1>ACCESS GRANTED</h1><p>Konami code · Respect 🫡</p></div>
 
 <script>
-/* ═══════ АВТО-ДЕТЕКТ УСТРОЙСТВА (скрытно) ═══════ */
-(function detectDevice(){
+/* АВТО-ДЕТЕКТ УСТРОЙСТВА */
+function detectDevice(){
   const ua = navigator.userAgent || '';
   const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
   const isTabletUA = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (isMobileUA && Math.min(screen.width, screen.height) >= 600);
@@ -624,18 +586,27 @@ table.jtable{border-collapse:separate;border-spacing:0;font-size:13px;table-layo
   if(isTabletUA || (w >= 600 && w < 1024)) device = 'tablet';
   else if(isMobileUA || w < 600) device = 'mobile';
   document.documentElement.setAttribute('data-device', device);
-  // Логируем тихо
-  console.log('%c[device] ' + device + ' (' + w + 'px)', 'color:#64748b;font-size:10px');
-})();
+  return device;
+}
+detectDevice();
 
-/* ═══════ BOOT ═══════ */
+/* BOOT */
 (function(){
   setTimeout(()=>{
-    document.getElementById('boot').classList.add('done');
+    const b = document.getElementById('boot');
+    if(b) b.classList.add('done');
     document.body.style.overflow='';
     maybeShowCookie();
   },6000);
   document.body.style.overflow='hidden';
+  // Страховка на случай если что-то пошло не так
+  setTimeout(()=>{
+    const b = document.getElementById('boot');
+    if(b && !b.classList.contains('done')){
+      b.classList.add('done');
+      document.body.style.overflow='';
+    }
+  },8000);
 })();
 function maybeShowCookie(){
   if(!localStorage.getItem('cookies_ok')){
@@ -648,10 +619,11 @@ function acceptCookies(){
   toast('Настройки сохранены');
 }
 
-/* ═══════ CURSOR ═══════ */
+/* CURSOR */
 (function(){
   const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
   if(!dot||!ring)return;
+  if(document.documentElement.getAttribute('data-device') !== 'desktop') return;
   let mx=0,my=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
   (function loop(){rx+=(mx-rx)*0.22;ry+=(my-ry)*0.22;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
@@ -661,7 +633,7 @@ function acceptCookies(){
   });
 })();
 
-/* ═══════ PARTICLES ═══════ */
+/* PARTICLES */
 (function(){
   const c=document.getElementById('particles');if(!c)return;
   const ctx=c.getContext('2d');
@@ -689,13 +661,13 @@ function acceptCookies(){
   })();
 })();
 
-/* ═══════ SCROLL ═══════ */
+/* SCROLL */
 addEventListener('scroll',()=>{
   const topbar=document.getElementById('topbar');
   if(topbar)topbar.classList.toggle('hidden',scrollY>150);
 });
 
-/* ═══════ THEME ═══════ */
+/* THEME */
 function toggleTheme(){
   const cur=document.documentElement.getAttribute('data-theme')||'dark';
   const next=cur==='dark'?'light':'dark';
@@ -716,7 +688,7 @@ function updateThemeIcon(){
   updateThemeIcon();
 })();
 
-/* ═══════ KEYBOARD ═══════ */
+/* KEYBOARD */
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeLogin();closeStudents();document.getElementById('easter').classList.remove('active')}
 });
@@ -729,7 +701,7 @@ document.addEventListener('keydown',e=>{
   });
 })();
 
-/* ═══════ ДАННЫЕ ═══════ */
+/* ДАННЫЕ */
 const USERS={'учитру':{pass:'09091',name:'учитель'},'админ':{pass:'12345',name:'хозяин'}};
 const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const WEEKDAYS_SHORT=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
@@ -782,6 +754,9 @@ const PREFILL = {
 '2026-09-10': {'Антипов Андрей Сергеевич':'Н','Ерофеев Руслан Андреевич':'У','Абулхадиров Сулейман Абдурахманович':'У','Джафаров Артём Самсонович':'У','Титаренко Павел Кириллович':'У'}
 };
 
+// Ключ localStorage изменён — чтобы старые версии не мешали
+const STORAGE_KEY = 'oib_journal_v20';
+
 let data = {
   students: STUDENTS.slice(),
   attendance: JSON.parse(JSON.stringify(PREFILL)),
@@ -799,19 +774,11 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function isTeacher(){return currentRole!==null}
 function getDevice(){return document.documentElement.getAttribute('data-device')||'desktop'}
 
-// Адаптивное отображение имени
 function displayName(fio){
   const parts = fio.trim().split(/\s+/);
-  const dev = getDevice();
   if(parts.length < 2) return fio;
-  if(dev === 'mobile'){
-    // Фамилия + первая буква имени
-    return parts[0] + ' ' + parts[1].charAt(0) + '.';
-  }
-  if(dev === 'tablet'){
-    return parts[0] + ' ' + parts[1];
-  }
-  // desktop — фамилия + имя
+  const dev = getDevice();
+  if(dev === 'mobile') return parts[0] + ' ' + parts[1].charAt(0) + '.';
   return parts[0] + ' ' + parts[1];
 }
 
@@ -822,9 +789,15 @@ function ensureData(){
   if(!data.notes) data.notes = [];
   if(!data.doneDz) data.doneDz = [];
 }
-function saveToStorage(){try{localStorage.setItem('siteData',JSON.stringify(data))}catch(e){console.warn(e)}}
+function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}catch(e){console.warn(e)}}
 function loadFromStorage(){
-  try{const s=localStorage.getItem('siteData');if(s)data={...data,...JSON.parse(s)}}catch(e){}
+  try{
+    const s=localStorage.getItem(STORAGE_KEY);
+    if(s){
+      const parsed = JSON.parse(s);
+      data = { ...data, ...parsed };
+    }
+  }catch(e){}
   ensureData();
 }
 
@@ -834,7 +807,7 @@ function getWorkingDays(year,month){
   const d=new Date(year,month,1);
   while(d.getMonth()===month){
     const dow=d.getDay();
-    if(dow!==0){ // Пн-Сб (пропускаем воскресенье)
+    if(dow!==0){
       const iso=`${year}-${String(month+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       days.push({iso, day:d.getDate(), month:month+1, dow:dow});
     }
@@ -884,25 +857,17 @@ function renderJournal(){
 
   document.getElementById('jtable').innerHTML = thead + tbody;
   updateHeroStats(dates);
-  updateScrollHint();
+  setTimeout(updateScrollHint, 50);
 }
 
-/* Показ градиента-подсказки справа если можно скроллить */
 function updateScrollHint(){
   const scroll = document.getElementById('journalScroll');
   const wrap = document.getElementById('journalWrap');
   if(!scroll || !wrap) return;
   const canScroll = scroll.scrollWidth > scroll.clientWidth + 10;
-  wrap.classList.toggle('show-hint', canScroll && getDevice() === 'mobile');
+  const atStart = scroll.scrollLeft < 20;
+  wrap.classList.toggle('show-hint', canScroll && atStart && getDevice() !== 'desktop');
 }
-document.getElementById('journalScroll').addEventListener('scroll', ()=>{
-  const scroll = document.getElementById('journalScroll');
-  const wrap = document.getElementById('journalWrap');
-  if(!scroll || !wrap) return;
-  const atEnd = scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 20;
-  if(atEnd) wrap.classList.remove('show-hint');
-  else if(getDevice() === 'mobile') wrap.classList.add('show-hint');
-});
 
 function updateHeroStats(dates){
   document.getElementById('hStudents').textContent = curStudents.length;
@@ -1116,28 +1081,32 @@ function renderNotes(){
   }
 }
 
-/* ═══════ ПЕРЕРИСОВКА ПРИ ИЗМЕНЕНИИ РАЗМЕРА / ОРИЕНТАЦИИ ═══════ */
+/* ПОДСКАЗКА СКРОЛЛА */
+(function(){
+  const scroll = document.getElementById('journalScroll');
+  if(!scroll) return;
+  scroll.addEventListener('scroll', ()=>{
+    const wrap = document.getElementById('journalWrap');
+    if(!wrap) return;
+    const atEnd = scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 20;
+    if(atEnd) wrap.classList.remove('show-hint');
+    else if(getDevice() !== 'desktop') wrap.classList.add('show-hint');
+  });
+})();
+
+/* РЕСАЙЗ */
 let resizeTimer;
 window.addEventListener('resize', ()=>{
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(()=>{
-    const w = window.innerWidth;
-    const ua = navigator.userAgent || '';
-    const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
-    const isTabletUA = /iPad|Tablet|PlayBook|Silk/i.test(ua) || (isMobileUA && Math.min(screen.width, screen.height) >= 600);
-    let device = 'desktop';
-    if(isTabletUA || (w >= 600 && w < 1024)) device = 'tablet';
-    else if(isMobileUA || w < 600) device = 'mobile';
     const oldDevice = document.documentElement.getAttribute('data-device');
-    if(oldDevice !== device){
-      document.documentElement.setAttribute('data-device', device);
-      renderJournal();
-    }
-    updateScrollHint();
-  }, 150);
+    const newDevice = detectDevice();
+    if(oldDevice !== newDevice) renderJournal();
+    else updateScrollHint();
+  }, 200);
 });
 
-/* ═══════ СТАРТ ═══════ */
+/* СТАРТ */
 (function init(){
   const now=new Date();
   curYear=now.getFullYear();
@@ -1148,7 +1117,7 @@ window.addEventListener('resize', ()=>{
   renderNotes();
 })();
 
-console.log('%cОИБ 1-26 · Журнал посещаемости v20.0','color:#60a5fa;font-weight:900;font-size:16px');
+console.log('%cОИБ 1-26 · Журнал посещаемости v20.1','color:#60a5fa;font-weight:900;font-size:16px');
 console.log('%cВход: УчитРУ / 09091','color:#a78bfa');
 </script>
 </body>
