@@ -22,13 +22,10 @@
   --amber: #fbbf24;
   --amber-2: #f59e0b;
   --amber-soft: rgba(251,191,36,.12);
-  --amber-glow: rgba(251,191,36,.5);
   --green: #4ade80;
   --green-soft: rgba(74,222,128,.12);
   --red: #f87171;
   --red-soft: rgba(248,113,113,.12);
-  --blue: #60a5fa;
-  --purple: #a78bfa;
   --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
   --ease: cubic-bezier(.2,.8,.2,1);
   --ease-out: cubic-bezier(.16,1,.3,1);
@@ -1226,7 +1223,7 @@ footer .brand { color: var(--amber); }
 
 <script>
 /* ============================================================
-   GITHUB API (через CORS-прокси)
+   GITHUB API — МУЛЬТИПРОКСИ
    ============================================================ */
 const GH = {
   token: [
@@ -1241,10 +1238,36 @@ const GH = {
   notesPath: 'notes'
 };
 
-const CORS_PROXY = 'https://corsproxy.io/?url=';
+/* Список прокси — пробуем по очереди, первый рабочий запоминаем */
+const PROXY_LIST = [
+  { name: 'corsproxy.io',  fn: u => 'https://corsproxy.io/?url=' + encodeURIComponent(u) },
+  { name: 'cors.eu.org',   fn: u => 'https://cors.eu.org/' + u },
+  { name: 'codetabs',      fn: u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
+  { name: 'thingproxy',    fn: u => 'https://thingproxy.freeboard.io/fetch/' + u },
+  { name: 'cors.workers',  fn: u => 'https://test.cors.workers.dev/?' + encodeURIComponent(u) }
+];
 
-function proxied(url) {
-  return CORS_PROXY + encodeURIComponent(url);
+let activeProxy = null;
+
+async function fetchViaProxy(apiUrl, opts) {
+  const toTry = activeProxy ? [activeProxy] : PROXY_LIST.slice();
+  let lastErr = null;
+  for (const proxy of toTry) {
+    const proxyUrl = proxy.fn(apiUrl);
+    try {
+      const res = await fetch(proxyUrl, opts);
+      if (!activeProxy) {
+        activeProxy = proxy;
+        dlog('Прокси найден: ' + proxy.name);
+      }
+      return res;
+    } catch(e) {
+      lastErr = e;
+      dlog('Не работает: ' + proxy.name, true);
+      if (activeProxy && activeProxy === proxy) activeProxy = null;
+    }
+  }
+  throw lastErr || new Error('все прокси упали');
 }
 
 const DEBUG_LOG = [];
@@ -1271,7 +1294,7 @@ function showDebug() {
 
 const ghApi = (path, opts = {}) => {
   const apiUrl = `https://api.github.com/repos/${GH.owner}/${GH.repo}/${path}`;
-  return fetch(proxied(apiUrl), {
+  return fetchViaProxy(apiUrl, {
     ...opts,
     headers: {
       'Authorization': `Bearer ${GH.token}`,
@@ -1296,7 +1319,7 @@ async function checkToken() {
       return false;
     }
   } catch (e) {
-    dlog('Прокси не отвечает: ' + e.message, true);
+    dlog('Все прокси не отвечают', true);
     return false;
   }
 }
@@ -1305,7 +1328,7 @@ async function ghListNotes() {
   dlog('Читаю папку ' + GH.notesPath + '...');
   const res = await ghApi(`contents/${GH.notesPath}?ref=${GH.branch}`);
   if (res.status === 404) {
-    dlog('Папки ' + GH.notesPath + ' нет. Создай её.', true);
+    dlog('Папки notes нет. Создай её.', true);
     return [];
   }
   if (!res.ok) {
