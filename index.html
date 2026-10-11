@@ -1223,7 +1223,7 @@ footer .brand { color: var(--amber); }
 
 <script>
 /* ============================================================
-   GITHUB API — МУЛЬТИПРОКСИ
+   GITHUB API — СВОЙ ПРОКСИ (CLOUDFLARE WORKERS)
    ============================================================ */
 const GH = {
   token: [
@@ -1238,36 +1238,10 @@ const GH = {
   notesPath: 'notes'
 };
 
-/* Список прокси — пробуем по очереди, первый рабочий запоминаем */
-const PROXY_LIST = [
-  { name: 'corsproxy.io',  fn: u => 'https://corsproxy.io/?url=' + encodeURIComponent(u) },
-  { name: 'cors.eu.org',   fn: u => 'https://cors.eu.org/' + u },
-  { name: 'codetabs',      fn: u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u) },
-  { name: 'thingproxy',    fn: u => 'https://thingproxy.freeboard.io/fetch/' + u },
-  { name: 'cors.workers',  fn: u => 'https://test.cors.workers.dev/?' + encodeURIComponent(u) }
-];
+const PROXY_URL = 'https://dhfhd.palvovgulist.workers.dev';
 
-let activeProxy = null;
-
-async function fetchViaProxy(apiUrl, opts) {
-  const toTry = activeProxy ? [activeProxy] : PROXY_LIST.slice();
-  let lastErr = null;
-  for (const proxy of toTry) {
-    const proxyUrl = proxy.fn(apiUrl);
-    try {
-      const res = await fetch(proxyUrl, opts);
-      if (!activeProxy) {
-        activeProxy = proxy;
-        dlog('Прокси найден: ' + proxy.name);
-      }
-      return res;
-    } catch(e) {
-      lastErr = e;
-      dlog('Не работает: ' + proxy.name, true);
-      if (activeProxy && activeProxy === proxy) activeProxy = null;
-    }
-  }
-  throw lastErr || new Error('все прокси упали');
+function proxied(url) {
+  return PROXY_URL + '/?url=' + encodeURIComponent(url);
 }
 
 const DEBUG_LOG = [];
@@ -1294,7 +1268,7 @@ function showDebug() {
 
 const ghApi = (path, opts = {}) => {
   const apiUrl = `https://api.github.com/repos/${GH.owner}/${GH.repo}/${path}`;
-  return fetchViaProxy(apiUrl, {
+  return fetch(proxied(apiUrl), {
     ...opts,
     headers: {
       'Authorization': `Bearer ${GH.token}`,
@@ -1319,7 +1293,7 @@ async function checkToken() {
       return false;
     }
   } catch (e) {
-    dlog('Все прокси не отвечают', true);
+    dlog('Прокси не отвечает: ' + e.message, true);
     return false;
   }
 }
